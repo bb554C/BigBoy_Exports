@@ -7,23 +7,31 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.ListSelectionModel;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JProgressBar;
 
 public class HomePage extends JFrame {
 
-	int int2dArray[][] = new int [100000][13];
+	int rowMaxSize = 100000;
+	int fullDataColumnMaxSize = 13;
+	int yearlyDataColumnMaxSize = fullDataColumnMaxSize - 3;
+	int monthlyDataColumnMaxSize = fullDataColumnMaxSize - 2;
+	int intFullData2dArray[][] = new int [rowMaxSize][fullDataColumnMaxSize];
+	int intYearData2dArray[][] = new int [rowMaxSize][yearlyDataColumnMaxSize];
+	int intMonthData2dArray[][] = new int [rowMaxSize][monthlyDataColumnMaxSize];
 	/**
 	 * 
 	 */
 	private databaseConnection dbConnection = new databaseConnection();
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JTable table;
+	private JTable table1;
+	private JTable table2;
+	private JTable table3;
 
 	/**
 	 * Launch the application.
@@ -57,27 +65,30 @@ public class HomePage extends JFrame {
 		tabbedPane.setBounds(5, 5, 786, 562);
 		contentPane.add(tabbedPane);
 		
-		JPanel panel = new JPanel();
-		tabbedPane.addTab("Data List", null, panel, null);
-		panel.setLayout(null);
+		JPanel panel1 = new JPanel();
+		panel1.setLayout(null);
+		tabbedPane.addTab("Full Data", null, panel1, null);
 		
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		scrollPane.setBounds(10, 10, 761, 480);
-		panel.add(scrollPane);
+		JScrollPane scrollPane1 = new JScrollPane();
+		scrollPane1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane1.setBounds(10, 10, 761, 480);
+		panel1.add(scrollPane1);
 		
-		table = new JTable();
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		table.setModel(new DefaultTableModel(
+		table1 = new JTable();
+		table1.setModel(new DefaultTableModel(
 			new Object[][] {
 			},
 			new String[] {
-				"ID", "Year", "Month", "Day", "Pacific_Northwest_Wheat", "Pacific_Northwest_Corn", "Pacific_Northwest_Soybeans", "Mississippi_Gulf_Wheat", "Mississippi_Gulf_Corn", "Mississippi_Gulf_Soybeans", "Texas_Gulf_Wheat", "Texas_Gulf_Corn", "Texas_Gulf_Soybeans"
-			}
-		) {
+					"ID", "Year", "Month", "Day", "Pacific_Northwest_Wheat", "Pacific_Northwest_Corn", "Pacific_Northwest_Soybeans", "Mississippi_Gulf_Wheat", "Mississippi_Gulf_Corn", "Mississippi_Gulf_Soybeans", "Texas_Gulf_Wheat", "Texas_Gulf_Corn", "Texas_Gulf_Soybeans"
+				}
+				) {
+			/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
 			Class[] columnTypes = new Class[] {
-				Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class
+					Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class
 			};
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
@@ -89,45 +100,226 @@ public class HomePage extends JFrame {
 				return columnEditables[column];
 			}
 		});
-		table.getColumnModel().getColumn(0).setPreferredWidth(40);
-		table.getColumnModel().getColumn(0).setMinWidth(40);
-		table.getColumnModel().getColumn(0).setMaxWidth(100);
-		table.getColumnModel().getColumn(1).setPreferredWidth(40);
-		table.getColumnModel().getColumn(1).setMinWidth(40);
-		table.getColumnModel().getColumn(1).setMaxWidth(100);
-		table.getColumnModel().getColumn(2).setPreferredWidth(40);
-		table.getColumnModel().getColumn(2).setMinWidth(40);
-		table.getColumnModel().getColumn(2).setMaxWidth(100);
-		table.getColumnModel().getColumn(3).setPreferredWidth(40);
-		table.getColumnModel().getColumn(3).setMinWidth(40);
-		table.getColumnModel().getColumn(3).setMaxWidth(100);
-		scrollPane.setViewportView(table);
+		table1.getColumnModel().getColumn(0).setPreferredWidth(40);
+		table1.getColumnModel().getColumn(0).setMinWidth(40);
+		table1.getColumnModel().getColumn(0).setMaxWidth(100);
+		table1.getColumnModel().getColumn(1).setPreferredWidth(40);
+		table1.getColumnModel().getColumn(1).setMinWidth(40);
+		table1.getColumnModel().getColumn(1).setMaxWidth(100);
+		table1.getColumnModel().getColumn(2).setPreferredWidth(40);
+		table1.getColumnModel().getColumn(2).setMinWidth(40);
+		table1.getColumnModel().getColumn(2).setMaxWidth(100);
+		table1.getColumnModel().getColumn(3).setPreferredWidth(40);
+		table1.getColumnModel().getColumn(3).setMinWidth(40);
+		table1.getColumnModel().getColumn(3).setMaxWidth(100);
+		scrollPane1.setViewportView(table1);
 		
-		JButton btnRefresh = new JButton("REFRESH");
-		btnRefresh.addActionListener(new ActionListener() {
+		JProgressBar progressBar1 = new JProgressBar();
+		progressBar1.setMaximum(100000);
+		progressBar1.setBounds(20, 500, 285, 25);
+		progressBar1.setStringPainted(true);
+		panel1.add(progressBar1);
+		
+		JButton btnRefresh1 = new JButton("REFRESH");
+		btnRefresh1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) 
 			{
-				DefaultTableModel model = (DefaultTableModel)table.getModel();
-				int2dArray = dbConnection.selectAll();
-				Object intArray[] = new Object[13];
-				int i = 0;
-				while (i < 100000 && int2dArray[i][0] != 0)
-				{
-					for (int j = 0; j < 13; j++)
-					{
-						intArray[j] = int2dArray[i][j];
-					}
-					model.addRow(intArray);
-					i++;
-				}
+				refreshButton1(progressBar1);
 			}
 		});
-		btnRefresh.setBounds(315, 500, 150, 25);
-		panel.add(btnRefresh);		
 		
-		JLabel lblNewLabel = new JLabel("Export in units of 1000 Bushels");
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel.setBounds(475, 500, 296, 25);
-		panel.add(lblNewLabel);
+		
+		btnRefresh1.setBounds(315, 500, 150, 25);
+		panel1.add(btnRefresh1);
+		
+		JLabel lblNewLabel1 = new JLabel("Export in units of 1000 Bushels");
+		lblNewLabel1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel1.setBounds(475, 500, 296, 25);
+		panel1.add(lblNewLabel1);
+		
+		JPanel panel2 = new JPanel();
+		panel2.setLayout(null);
+		tabbedPane.addTab("Yearly SUM", null, panel2, null);
+		
+		JScrollPane scrollPane2 = new JScrollPane();
+		scrollPane2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane2.setBounds(10, 10, 761, 480);
+		panel2.add(scrollPane2);
+		
+		table2 = new JTable();
+		table2.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"Year", "Pacific_Northwest_Wheat", "Pacific_Northwest_Corn", "Pacific_Northwest_Soybeans", "Mississippi_Gulf_Wheat", "Mississippi_Gulf_Corn", "Mississippi_Gulf_Soybeans", "Texas_Gulf_Wheat", "Texas_Gulf_Corn", "Texas_Gulf_Soybeans"
+			}
+		) {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+			Class[] columnTypes = new Class[] {
+					Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class
+			};
+			public Class getColumnClass(int columnIndex) {
+				return columnTypes[columnIndex];
+			}
+			boolean[] columnEditables = new boolean[] {
+					false, false, false, false, false, false, false, false, false, false
+			};
+			public boolean isCellEditable(int row, int column) {
+				return columnEditables[column];
+			}
+		});
+		table2.getColumnModel().getColumn(0).setPreferredWidth(40);
+		table2.getColumnModel().getColumn(0).setMinWidth(40);
+		table2.getColumnModel().getColumn(0).setMaxWidth(100);
+		scrollPane2.setViewportView(table2);
+		
+		JProgressBar progressBar2 = new JProgressBar();
+		progressBar2.setStringPainted(true);
+		
+		JButton btnRefresh2 = new JButton("REFRESH");
+		btnRefresh2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) 
+			{
+				refreshButton2(progressBar2);
+			}
+		});
+		progressBar2.setMaximum(100000);
+		progressBar2.setBounds(20, 500, 285, 25);
+		panel2.add(progressBar2);
+		btnRefresh2.setBounds(315, 500, 150, 25);
+		panel2.add(btnRefresh2);
+		
+		JLabel lblNewLabel2 = new JLabel("Export in units of 1000 Bushels");
+		lblNewLabel2.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel2.setBounds(475, 500, 296, 25);
+		panel2.add(lblNewLabel2);
+		
+		JPanel panel3 = new JPanel();
+		panel3.setLayout(null);
+		tabbedPane.addTab("Monthly SUM", null, panel3, null);
+		
+		JScrollPane scrollPane3 = new JScrollPane();
+		scrollPane3.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane3.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane3.setBounds(10, 10, 761, 480);
+		panel3.add(scrollPane3);
+		
+		table3 = new JTable();
+		table3.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+					"Year", "Month", "Pacific_Northwest_Wheat", "Pacific_Northwest_Corn", "Pacific_Northwest_Soybeans", "Mississippi_Gulf_Wheat", "Mississippi_Gulf_Corn", "Mississippi_Gulf_Soybeans", "Texas_Gulf_Wheat", "Texas_Gulf_Corn", "Texas_Gulf_Soybeans"
+			}
+		) {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+			Class[] columnTypes = new Class[] {
+					Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class
+			};
+			public Class getColumnClass(int columnIndex) {
+				return columnTypes[columnIndex];
+			}
+			boolean[] columnEditables = new boolean[] {
+					false, false, false, false, false, false, false, false, false, false, false
+			};
+			public boolean isCellEditable(int row, int column) {
+				return columnEditables[column];
+			}
+		});
+		table3.getColumnModel().getColumn(0).setPreferredWidth(40);
+		table3.getColumnModel().getColumn(0).setMinWidth(40);
+		table3.getColumnModel().getColumn(0).setMaxWidth(100);
+		table3.getColumnModel().getColumn(1).setPreferredWidth(40);
+		table3.getColumnModel().getColumn(1).setMinWidth(40);
+		table3.getColumnModel().getColumn(1).setMaxWidth(100);
+		table3.getColumnModel().getColumn(2).setPreferredWidth(40);
+		table3.getColumnModel().getColumn(2).setMinWidth(40);
+		table3.getColumnModel().getColumn(2).setMaxWidth(100);
+		scrollPane3.setViewportView(table3);
+		
+		JProgressBar progressBar3 = new JProgressBar();
+		progressBar3.setStringPainted(true);
+		JButton btnRefresh3 = new JButton("REFRESH");
+		btnRefresh3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) 
+			{
+				refreshButton3(progressBar3);
+			}
+		});
+		
+		
+		progressBar3.setMaximum(100000);
+		progressBar3.setBounds(10, 500, 285, 25);
+		panel3.add(progressBar3);
+		btnRefresh3.setBounds(315, 500, 150, 25);
+		panel3.add(btnRefresh3);
+		
+		JLabel lblNewLabel3 = new JLabel("Export in units of 1000 Bushels");
+		lblNewLabel3.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel3.setBounds(475, 500, 296, 25);
+		panel3.add(lblNewLabel3);
+	}
+	
+	public void clearTable(DefaultTableModel model)
+	{
+		int rows = model.getRowCount(); 
+		for(int i = rows - 1; i >=0; i--)
+		{
+		   model.removeRow(i); 
+		}
+	}
+	
+	public void refreshButton1(JProgressBar progressBartemp)
+	{
+		progressBartemp.setValue(0);
+		DefaultTableModel model1 = (DefaultTableModel)table1.getModel();
+		clearTable(model1);
+		intFullData2dArray = dbConnection.selectAll();
+		Object intArray[] = new Object[fullDataColumnMaxSize];
+		int i = 0;
+		while (i < rowMaxSize && intFullData2dArray[i][0] != 0)
+		{
+			for (int j = 0; j < fullDataColumnMaxSize; j++)
+			{
+				intArray[j] = intFullData2dArray[i][j];
+			}
+			model1.addRow(intArray);
+			progressBartemp.setValue(i);
+			i++;
+		}
+		progressBartemp.setValue(rowMaxSize);
+	}
+	
+	public void refreshButton2(JProgressBar progressBartemp)
+	{
+		progressBartemp.setValue(0);
+		DefaultTableModel model2 = (DefaultTableModel)table2.getModel();
+		clearTable(model2);
+		intYearData2dArray = dbConnection.selectYearly();
+		yearSUMmultiThread yearSUMmtc = new yearSUMmultiThread();
+		yearSUMmtc.setValue(intYearData2dArray);
+		yearSUMmtc.setPanel(table2, progressBartemp);
+		Thread thread1 = new Thread(yearSUMmtc);
+		thread1.start();
+	}
+	
+	public void refreshButton3(JProgressBar progressBartemp)
+	{
+		progressBartemp.setValue(0);
+		DefaultTableModel model3 = (DefaultTableModel)table3.getModel();
+		clearTable(model3);
+		intMonthData2dArray = dbConnection.selectMonthly();
+		monthSUMmultiThread monthSUMmtc = new monthSUMmultiThread();
+		monthSUMmtc.setValue(intMonthData2dArray);
+		monthSUMmtc.setPanel(table3, progressBartemp);
+		Thread thread2 = new Thread(monthSUMmtc);
+		thread2.start();
 	}
 }
